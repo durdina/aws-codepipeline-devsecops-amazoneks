@@ -8,13 +8,13 @@
 * [Amazon EventBridge](https://aws.amazon.com/eventbridge/) - Amazon EventBridge Event Bus is a serverless event bus that helps you receive, filter, transform, route, and deliver events.
 * [Developer Tools on AWS](https://aws.amazon.com/products/developer-tools/)
   * [AWS CodeBuild](https://aws.amazon.com/codebuild/) - AWS CodeBuild is a fully managed build service in the cloud.
-  * [AWS CodeCommit](https://aws.amazon.com/codecommit/) – AWS CodeCommit is a version control service hosted that you can use to privately store and manage assets.
   * [AWS CodePipeline](https://aws.amazon.com/codepipeline/) - AWS CodePipeline is a continuous delivery service you can use to model, visualize, and automate the steps required to release your software.
 * [Amazon Elastic Kubernetes Service (Amazon EKS)](https://aws.amazon.com/eks/) - Amazon EKS is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes.
 * [Amazon Elastic Container Registry (Amazon ECR)](https://aws.amazon.com/ecr/) - Amazon ECR is an AWS managed container image registry service that is secure, scalable, and reliable. 
 * [Amazon CodeGuru](https://aws.amazon.com/codeguru/) - Amazon CodeGuru is a developer tool that provides intelligent recommendations to improve code quality and identify an application’s most expensive lines of code.
 * [AWS Security Hub](https://aws.amazon.com/security-hub/) - AWS Security Hub is a cloud security posture management service that performs security best practice checks, aggregates alerts, and enables automated remediation.
-* [Amazon S3 – Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) - S3 is storage for the internet. 
+* [Amazon S3 – Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) - S3 is storage for the internet.
+* [GitHub](https://github.com/) - GitHub is a version control service that you can use to privately store and manage assets.
 * [Aqua Security Trivy](https://github.com/aquasecurity/trivy) – Trivy is a simple and comprehensive scanner for vulnerabilities in container images, file systems, and Git repositories, in addition to configuration issues. 
 * [Apache Maven](https://maven.apache.org/) – Apache Maven is a software project management and comprehension tool. 
 * [Helm](https://helm.sh/) - Helm helps you manage Kubernetes applications. 

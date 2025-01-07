@@ -13,7 +13,7 @@ It also emphasizes on how to monitor and manage the entire lifecycle of a Java a
 
 The diagram shows the following workflow:
 
-1. Developer will update the Java application code in the base branch of the AWS CodeCommit repository, creating a Pull Reqeust (PR).
+1. Developer will update the Java application code in the base branch of the GitHub repository, creating a Pull Reqeust (PR).
 
 2. Amazon CodeGuru Reviewer automatically reviews the code as soon as a PR is submitted and does a analysis of java code as per the best practices and gives recommendations to users.
 
@@ -50,7 +50,7 @@ The diagram shows the following workflow:
 │   └── buildspec_secscan.yaml
 ├── cf_templates
 │   ├── build_deployment.yaml
-│   ├── codecommit_ecr.yaml
+│   ├── ecr.yaml
 │   └── kube_aws_auth_configmap_patch.sh
 ├── code
 │   └── app
@@ -99,7 +99,7 @@ buildspec
 ```bash
 cf_templates
 ├── build_deployment.yaml (Pipeline Stack Setup)
-├── codecommit_ecr.yaml (Codecommit and ECR Setup)
+├── ecr.yaml (ECR Setup)
 └── kube_aws_auth_configmap_patch.sh (Providing access to Pipeline to deploy helm charts to EKS cluster)
 ```
 
@@ -149,55 +149,49 @@ securityhub
 
 **Setup Procedure:**
 
-1) **Upload code zip to S3 Bucket**:  
-   (Ensure git and python 3.x are installed in your local workstation)
-- Clone the repository to your local workstation<br/>
+1) **Code repository preparation**:
+- Create new repository in GitHub.
+- Clone this repository to your local workstation<br/>
 
      `git clone <GitHub-Url>`
 
-- Navigate to the repository and execute the commands in order as indicated below. This will create compressed version of the entire code with .zip extension(**cicdstack.zip**) and will validate the zip file too:<br/>
-**Note:**  you may need to use python3 for the following command(s).
+- Navigate to the work directory and execute the commands in order as indicated below. This will bring content of the work directory to your new GitHub repository<br/>
 
      ```bash
     cd <cloned-repository>
-    python -m zipfile -c cicdstack.zip *
-    python -m zipfile -t cicdstack.zip
+    git remote rename origin upstream
+    git remote add origin <new GitHub-Url>
+    git push -u origin main
    ```
-   We have cicdstack.zip file ready and this will be used in next step.<br/>
-      
-- Sign in to the AWS Management Console, open the Amazon S3 console, and then create an S3 bucket.
-   Create a folder in the S3 bucket. We recommend naming this folder **code**.
-   Upload **cicdstack.zip** created in earlier step to the code folder in the S3 bucket.  
+  **Note:** Alternatively follow [Duplicating a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/duplicating-a-repository).
 
-
-2) **CodeCommitECR Creation**:  
-   Ensure you have previously created AWS CodeCommit and Amazon ECR and that you have retrieved the necessary parameter values. If not, you can run the CloudFormation template **cf_templates/codecommit_ecr.yaml** via AWS Console. Ensure the code in zip format is uploaded as per step 1.
+2) **ECR Creation**:  
+   Ensure you have previously created Amazon ECR and that you have retrieved the necessary parameter values. If not, you can run the CloudFormation template **cf_templates/ecr.yaml** via AWS Console.
    Give the parameter and their values:
 
    | Parameter | Description |
    |--|--|
-   |CodeCommitRepositoryBranchName  |Branch-name  where  the  code  resides.  Put  it  as  main  for  default  |
-   | CodeCommitRepositoryName | Preferred  Name  of  AWS  CodeCommit  repo  to  be  created |
-   |CodeCommitRepositoryS3Bucket|S3  BucketName  where  the  code  zipfile  resides|
-   | CodeCommitRepositoryS3BucketObjKey | code/cicdstack.zip |
    | ECRRepositoryName | Preferred  Name  of  ECR  repo  to  be  created |
 
 3) **Setup Java CICD Pipeline**:
    
    Run the cloudformation template **cf_templates/build_deployment.yaml** and give the parameter accordingly as mentioned below. Ensure you have the required parameter values ready with you.  
-   **Note:**  To retrieve your **EksWorkerNodeRoleARN**, browse to the EC2 AWS Console and select one of your EKS Worker Node.  Navigate to **Security** tab panel and  click on **IAM Role** - follow that link to the Role Summary which will have display the Node IAM role and IAM role ARN.
-
-   | Parameter | Description |
-   |--|--|
-   | CodeBranchName |Branch  name  of  AWS  CodeCommit  repo,  where  your  code  resides  |
-   | EKSClusterName |Name  of  your  EKS  Cluster (not EKSCluster  ID)  |
-   | EKSCodeBuildAppName|in  this  case  name  of  app  helm  chart (**aws-proserve-java-greeting**)|
-   | EKSWorkerNodeRoleARN | ARN  of  EKS  Worker  nodes  IAM  role |
-   | EKSWorkerNodeRoleName | Name  of  the  IAM  role  assigned  to  EKS  worker  nodes |
-   |EcrDockerRepository|Name  of  Amazon  ECR  repo  where  the  docker  images  of  your  code  will  be  stored|
-   |EmailRecipient  | Email  Address  where  build  notifications  needs  to  be  sent |
-   | EnvType | environment,  e.g:  dev (since we  have  values.dev.yaml  in  helm_charts  folder) |
-   |SourceRepoName  | Name  of  AWS  CodeCommit  repo,  where  your  code  resides |
+   **Note:** To retrieve your **EksWorkerNodeRoleARN**, browse to the EC2 AWS Console and select one of your EKS Worker Node.  Navigate to **Security** tab panel and  click on **IAM Role** - follow that link to the Role Summary which will have display the Node IAM role and IAM role ARN.<br/>
+   **Note:** To create new connection to GitHub repository created in the step 1) follow [Create a connection to GitHub](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html).
+   
+   | Parameter             | Description                                                                                                |
+   |-----------------------|------------------------------------------------------------------------------------------------------------|
+   | SourceRepoConnection  | ARN of connection to GitHub account where your code resides                                                |
+   | SourceRepoName        | GitHub repo name where your code resides. You must maintain the correct case for the SourceRepoName value. |
+   | CodeBranchName        | Branch  name  of  GitHub  repo,  where  your  code  resides                                                |
+   | EKSClusterName        | Name  of  your  EKS  Cluster (not EKSCluster  ID)                                                          |
+   | EKSCodeBuildAppName   | in  this  case  name  of  app  helm  chart (**aws-proserve-java-greeting**)                                |
+   | EKSWorkerNodeRoleARN  | ARN  of  EKS  Worker  nodes  IAM  role                                                                     |
+   | EKSWorkerNodeRoleName | Name  of  the  IAM  role  assigned  to  EKS  worker  nodes                                                 |
+   | EcrDockerRepository   | Name  of  Amazon  ECR  repo  where  the  docker  images  of  your  code  will  be  stored                  |
+   | EmailRecipient        | Email  Address  where  build  notifications  needs  to  be  sent                                           |
+   | EnvType               | environment,  e.g:  dev (since we  have  values.dev.yaml  in  helm_charts  folder)                         |
+   
    
    The creation of the Java CICD Pipeline will automatically trigger the CodePipeline too.  
    Once the cloudformation template **cf_templates/build_deployment.yaml** executes successfully, go to Outputs tab of Java CICD CF Stack in AWS console and get the value of **EksCodeBuildkubeRoleARN** (this ARN needs to be added to configmap aws_auth of EKS cluster).   
@@ -210,6 +204,11 @@ securityhub
    As of today, there is no support for cloudformation for this integration, hence this process has to be done manually. 
    Navigate to AWS Security Hub in AWS Console and further navigate to Integrations. Search for Aqua Security and select **Aqua Security: Aqua Security** Integration and click on **Accept findings**
 
+   **Note: This is an important step !**<br/>
+   By failing to carry out this step a very hard to interpret AccessDeniedException occurs during execution of the pipeline even if theCodeBuildServiceRole has full administrative permissions.
+     ```bash
+    An error occurred (AccessDeniedException) when calling the BatchImportFindings operation: User: arn:aws:sts::<account>:assumed-role/<CodeBuildServiceRole>/<SessionId> is not authorized to perform: securityhub:BatchImportFindings on resource: arn:aws:securityhub:us-east-1::product/aquasecurity/aquasecurity
+   ```
 
 5) **Patching aws_auth confmap with EksCodeBuildkubeRoleARN received from step3**:
    
