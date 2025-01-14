@@ -6,7 +6,7 @@ Description: CFN Template to deploy CodePipeline to build Docker Image of java a
 Parameters:
   SourceRepoName:
     Type: String
-    Description: AWS CodeCommit RepoName where code resides
+    Description: GitHub RepoName where code resides
   CodeBranchName:
     Type: String
     Default: main
@@ -45,12 +45,13 @@ Resources:
         Name: MySecurityHub
         Purpose: Security
 
-  SourceRepositoryAssociation:
-    Type: AWS::CodeGuruReviewer::RepositoryAssociation
-    Properties:
-      Name: !Ref SourceRepoName
-      Type: CodeCommit
-      BucketName: !Ref CodeGuruReviewerBucket
+  # Reenable via GitHub Actions (Type: S3Bucket) https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/working-with-cicd.html
+  # SourceRepositoryAssociation:
+  #   Type: AWS::CodeGuruReviewer::RepositoryAssociation
+  #   Properties:
+  #     Name: !Ref SourceRepoName
+  #     Type: GitHub
+  #     BucketName: !Ref CodeGuruReviewerBucket
 
   MyProfilingGroup:
     Type: AWS::CodeGuruProfiler::ProfilingGroup
@@ -408,16 +409,16 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Resource: !Sub arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceRepoName}
-                Effect: Allow
-                Action:
-                  - codecommit:GetBranch
-                  - codecommit:GetCommit
-                  - codecommit:ListRepositories
-                  - codecommit:GetRepository
-                  - codecommit:UploadArchive
-                  - codecommit:GetUploadArchiveStatus
-                  - codecommit:CancelUploadArchive
+              # - Resource: !Sub arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceRepoName}
+              #   Effect: Allow
+              #   Action:
+              #     - codecommit:GetBranch
+              #     - codecommit:GetCommit
+              #     - codecommit:ListRepositories
+              #     - codecommit:GetRepository
+              #     - codecommit:UploadArchive
+              #     - codecommit:GetUploadArchiveStatus
+              #     - codecommit:CancelUploadArchive
               - Resource:
                   - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeBuildImageProject}
                   - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeDeployImageProject}
@@ -428,14 +429,14 @@ Resources:
                   - codebuild:BatchGetBuilds
                   - codebuild:BatchGetBuildBatches
                   - codebuild:StartBuildBatch
-              - Resource: !GetAtt SourceRepositoryAssociation.AssociationArn
-                Effect: Allow
-                Action:
-                  - codeguru-reviewer:List*
-                  - codeguru-reviewer:Describe*
-                  - codeguru-reviewer:Get*
-                  - codeguru:Get*
-                  - codeguru-reviewer:CreateCodeReview
+              # - Resource: !GetAtt SourceRepositoryAssociation.AssociationArn
+              #   Effect: Allow
+              #   Action:
+              #     - codeguru-reviewer:List*
+              #     - codeguru-reviewer:Describe*
+              #     - codeguru-reviewer:Get*
+              #     - codeguru:Get*
+              #     - codeguru-reviewer:CreateCodeReview
               - Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${EcrDockerRepository}
                 Effect: Allow
                 Action:
@@ -530,25 +531,25 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-              - Resource: !Sub arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceRepoName}
-                Effect: Allow
-                Action:
-                  - codecommit:GitPull
-                  - codecommit:TagResource
+              # - Resource: !Sub arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceRepoName}
+              #   Effect: Allow
+              #   Action:
+              #     - codecommit:GitPull
+              #     - codecommit:TagResource
               - Resource: "*"
                 Effect: Allow
                 Action:
                   - codeguru-reviewer:AssociateRepository
-              - Resource: 
-                  - !GetAtt SourceRepositoryAssociation.AssociationArn
-                  - !Sub arn:${AWS::Partition}:codeguru-reviewer:${AWS::Region}:${AWS::AccountId}:*
-                Effect: Allow
-                Action:
-                  - codeguru-reviewer:List*
-                  - codeguru-reviewer:Describe*
-                  - codeguru-reviewer:Get*
-                  - codeguru:Get*
-                  - codeguru-reviewer:CreateCodeReview
+              # - Resource: 
+              #     - !GetAtt SourceRepositoryAssociation.AssociationArn
+              #     - !Sub arn:${AWS::Partition}:codeguru-reviewer:${AWS::Region}:${AWS::AccountId}:*
+              #   Effect: Allow
+              #   Action:
+              #     - codeguru-reviewer:List*
+              #     - codeguru-reviewer:Describe*
+              #     - codeguru-reviewer:Get*
+              #     - codeguru:Get*
+              #     - codeguru-reviewer:CreateCodeReview
               - Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
                 Effect: Allow
                 Action:
@@ -618,8 +619,8 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Source:
-        Location:
-          Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
+        # Location:
+        #   Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
         Type: CODEPIPELINE
         BuildSpec: "buildspec/buildspec_secscan.yaml"
       TimeoutInMinutes: 30
@@ -649,8 +650,8 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Source:
-        Location:
-          Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
+        # Location:
+        #   Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
         Type: CODEPIPELINE
         BuildSpec: "buildspec/buildspec.yml"
       TimeoutInMinutes: 30
@@ -680,8 +681,8 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Source:
-        Location:
-          Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
+        # Location:
+        #   Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
         Type: CODEPIPELINE
         BuildSpec: "buildspec/buildspec_deploy.yml"
       TimeoutInMinutes: 30
@@ -729,12 +730,15 @@ Resources:
                 Category: Source
                 Owner: AWS
                 Version: 1
-                Provider: CodeCommit
+               # Provider: CodeCommit
+                Provider: CodeStarSourceConnection
               Configuration:
+                ConnectionArn: arn:aws:codeconnections:us-east-1:840195444908:connection/7221ca67-372a-4779-8e1b-f9171636626d #TODO: create input param
+                FullRepositoryId: !Ref SourceRepoName
                 BranchName: !Ref CodeBranchName
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
-                RepositoryName:
-                  Ref: SourceRepoName
+                # RepositoryName:
+                #   Ref: SourceRepoName
               OutputArtifacts:
                 - Name: SourceCodeApp
               RunOrder: 1
