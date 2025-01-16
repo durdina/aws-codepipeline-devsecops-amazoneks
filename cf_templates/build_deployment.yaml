@@ -828,7 +828,7 @@ Outputs:
     Description: ARN of CodeBuildservicerole
     Value: !GetAtt CodeBuildServiceRole.Arn
   EksCodeBuildkubeRoleARN:
-    Description: ARN of EksCodeBuildkubeRole which will be added in aws-auth configmap for deployment to EKS
+    Description: ARN of EksCodeBuildkubeRole needs to be added in aws-auth configmap or specified in EKS access entry to allow deployment from CodeBuild to EKS (see buildspec_deploy.yml).
     Value: !GetAtt EksCodeBuildkubeRole.Arn
   CodePipelineURL:
     Description: Codepipeline URL for this stack
