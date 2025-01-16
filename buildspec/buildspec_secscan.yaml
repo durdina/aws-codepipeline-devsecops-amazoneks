@@ -10,7 +10,6 @@ phases:
        - apt-get install -y wget apt-transport-https gnupg lsb-release curl
        - curl -OL https://github.com/aws/aws-codeguru-cli/releases/download/0.2.3/aws-codeguru-cli.zip
        - unzip aws-codeguru-cli.zip
-       - export PATH=$PATH:./aws-codeguru-cli/bin
        - curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
        - helm repo add stable https://charts.helm.sh/stable && helm repo update
 
