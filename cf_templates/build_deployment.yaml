@@ -4,9 +4,16 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: CFN Template to deploy CodePipeline to build Docker Image of java application and push to ECR and deploy to EKS following DevSecOps Practices
 
 Parameters:
+  SourceRepoConnection:
+    Type: String
+    Description: >
+      Connection to GitHub repository where the code resides. Connection can be created via CLI or Console in Pending state but then needs to
+      be activated in Console (https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html).
   SourceRepoName:
     Type: String
-    Description: GitHub RepoName where code resides
+    Description: >
+      GitHub RepoName where code resides. You must maintain the correct case for the SourceRepoName value. 
+      For example, if your user name is some-user and repo name is My-Repo, the recommended value of SourceRepoName is some-user/My-Repo.
   CodeBranchName:
     Type: String
     Default: main
@@ -45,7 +52,7 @@ Resources:
         Name: MySecurityHub
         Purpose: Security
 
-  # Reenable via GitHub Actions (Type: S3Bucket) https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/working-with-cicd.html
+  # TODO: Reenable via GitHub Actions (Type: S3Bucket) https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/working-with-cicd.html
   # SourceRepositoryAssociation:
   #   Type: AWS::CodeGuruReviewer::RepositoryAssociation
   #   Properties:
@@ -342,6 +349,8 @@ Resources:
               - s3:GetObject
               - s3:GetObjectVersion
               - s3:GetBucketVersioning
+              - s3:DeleteObject
+              - s3:DeleteObjectVersion
             Effect: Allow
             Resource:
               - !Sub arn:${AWS::Partition}:s3:::${CodeGuruReviewerBucket}
@@ -419,6 +428,11 @@ Resources:
               #     - codecommit:UploadArchive
               #     - codecommit:GetUploadArchiveStatus
               #     - codecommit:CancelUploadArchive
+              - Resource: !Ref SourceRepoConnection
+                Effect: Allow
+                Action:
+                  - codeconnections:UseConnection
+                  - codestar-connections:UseConnection
               - Resource:
                   - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeBuildImageProject}
                   - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeDeployImageProject}
@@ -536,20 +550,26 @@ Resources:
               #   Action:
               #     - codecommit:GitPull
               #     - codecommit:TagResource
+              - Resource: !Ref SourceRepoConnection
+                Effect: Allow
+                Action:
+                  - codeconnections:UseConnection
+                  - codestar-connections:UseConnection
+                  - codeconnections:GetConnectionToken
               - Resource: "*"
                 Effect: Allow
                 Action:
                   - codeguru-reviewer:AssociateRepository
-              # - Resource: 
-              #     - !GetAtt SourceRepositoryAssociation.AssociationArn
-              #     - !Sub arn:${AWS::Partition}:codeguru-reviewer:${AWS::Region}:${AWS::AccountId}:*
-              #   Effect: Allow
-              #   Action:
-              #     - codeguru-reviewer:List*
-              #     - codeguru-reviewer:Describe*
-              #     - codeguru-reviewer:Get*
-              #     - codeguru:Get*
-              #     - codeguru-reviewer:CreateCodeReview
+              - Resource: 
+                  # - !GetAtt SourceRepositoryAssociation.AssociationArn
+                  - !Sub arn:${AWS::Partition}:codeguru-reviewer:${AWS::Region}:${AWS::AccountId}:*
+                Effect: Allow
+                Action:
+                  - codeguru-reviewer:List*
+                  - codeguru-reviewer:Describe*
+                  - codeguru-reviewer:Get*
+                  - codeguru:Get*
+                  - codeguru-reviewer:CreateCodeReview
               - Resource: !Sub arn:${AWS::Partition}:eks:${AWS::Region}:${AWS::AccountId}:cluster/${EKSClusterName}
                 Effect: Allow
                 Action:
@@ -733,7 +753,7 @@ Resources:
                # Provider: CodeCommit
                 Provider: CodeStarSourceConnection
               Configuration:
-                ConnectionArn: arn:aws:codeconnections:us-east-1:840195444908:connection/7221ca67-372a-4779-8e1b-f9171636626d #TODO: create input param
+                ConnectionArn: !Ref SourceRepoConnection
                 FullRepositoryId: !Ref SourceRepoName
                 BranchName: !Ref CodeBranchName
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
