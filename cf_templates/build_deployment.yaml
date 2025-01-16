@@ -639,8 +639,6 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Source:
-        # Location:
-        #   Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
         Type: CODEPIPELINE
         BuildSpec: "buildspec/buildspec_secscan.yaml"
       TimeoutInMinutes: 30
@@ -670,8 +668,6 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Source:
-        # Location:
-        #   Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
         Type: CODEPIPELINE
         BuildSpec: "buildspec/buildspec.yml"
       TimeoutInMinutes: 30
@@ -701,8 +697,6 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Source:
-        # Location:
-        #   Fn::Sub: https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${SourceRepoName}
         Type: CODEPIPELINE
         BuildSpec: "buildspec/buildspec_deploy.yml"
       TimeoutInMinutes: 30
