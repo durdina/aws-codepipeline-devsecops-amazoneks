@@ -531,7 +531,8 @@ Resources:
                   - cloudwatch:DescribeAlarmsForMetric
                   - iam:GenerateCredentialReport
                   - iam:GetCredentialReport
-              - Resource: !Sub arn:${AWS::Partition}:securityhub:${AWS::Region}::product/aquasecurity/aquasecurity
+              - Sid: MakeSureToManuallyEnableIntegrationForAquasecurityInSecurityHubConsoleOtherwiseThisWontWork
+                Resource: !Sub arn:${AWS::Partition}:securityhub:${AWS::Region}::product/aquasecurity/aquasecurity
                 Effect: Allow
                 Action:
                   - securityhub:BatchImportFindings
