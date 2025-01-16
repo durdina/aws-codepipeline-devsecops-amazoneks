@@ -34,7 +34,7 @@ Resources:
   DockerRepo:
     Type: AWS::ECR::Repository
     Properties:
-      ImageTagMutability: IMMUTABLE
+      ImageTagMutability: MUTABLE
       ImageScanningConfiguration:
         ScanOnPush: true
       EncryptionConfiguration:
