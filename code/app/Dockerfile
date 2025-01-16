@@ -7,7 +7,7 @@ ENV AWS_REGION=$AWS_REGION
 ENV CODEGURU_PROFILER_AGENT_DOWNLOAD_URL 'https://d1osg35nybn3tt.cloudfront.net/com/amazonaws/codeguru-profiler-java-agent-standalone/1.2.2/codeguru-profiler-java-agent-standalone-1.2.2.jar'
 RUN mkdir -p /opt/target
 RUN apk update && apk add wget && wget $CODEGURU_PROFILER_AGENT_DOWNLOAD_URL -O /opt/target/codeguru-profiler-java-agent-standalone.jar
-RUN apk add libcrypto3=3.0.8-r0 libssl3=3.0.8-r0
+RUN apk add --upgrade libcrypto3 libssl3
 EXPOSE 8080 5005
 COPY target/aws-proserve-java-greeting.war /opt/target/
 WORKDIR /opt/target
