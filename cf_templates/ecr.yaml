@@ -74,13 +74,5 @@ Resources:
       RepositoryName: !Ref ECRRepositoryName
 
 Outputs:
-  # CodeCommitRepoUrl:
-  #   Value:
-  #     Fn::Join:
-  #       - ""
-  #       - - "https://console.aws.amazon.com/codecommit/repositories/home?region="
-  #         - Ref: AWS::Region
-  #         - "#/view/"
-  #         - Ref: MyRepo
   ECRUrl:
     Value: !Sub https://console.aws.amazon.com/ecr/repositories/private/${AWS::AccountId}/${DockerRepo}?region=${AWS::Region}
