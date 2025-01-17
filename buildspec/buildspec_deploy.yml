@@ -16,15 +16,15 @@ phases:
 
   pre_build: # Check helm version and Add kubeconfig to access to EKS cluster and check readiness of the cluster
     commands:
-      - "helm version"
-      - "mkdir ~/.kube/"
-      - "aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_CODEBUILD_ROLE_ARN"
-      - "chmod 0600 ~/.kube/config"
-      - "aws sts get-caller-identity"
+      - helm version
+      - mkdir ~/.kube/
+      - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_CODEBUILD_ROLE_ARN
+      - chmod 0600 ~/.kube/config
+      - aws sts get-caller-identity
   
   build: # Deploy app via Helm
     commands:
-      - "helm upgrade -i $EKS_CODEBUILD_APP_NAME-$ENV helm_charts/$EKS_CODEBUILD_APP_NAME -f helm_charts/$EKS_CODEBUILD_APP_NAME/values.$ENV.yaml --set image.repository=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME --set image.tag=$CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - helm upgrade -i $EKS_CODEBUILD_APP_NAME-$ENV helm_charts/$EKS_CODEBUILD_APP_NAME -f helm_charts/$EKS_CODEBUILD_APP_NAME/values.$ENV.yaml --set image.repository=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME --set image.tag=$CODEBUILD_RESOLVED_SOURCE_VERSION
   
   post_build: # Display the endpoint of the application
     commands:
