@@ -52,14 +52,6 @@ Resources:
         Name: MySecurityHub
         Purpose: Security
 
-  # TODO: Reenable via GitHub Actions (Type: S3Bucket) https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/working-with-cicd.html
-  # SourceRepositoryAssociation:
-  #   Type: AWS::CodeGuruReviewer::RepositoryAssociation
-  #   Properties:
-  #     Name: !Ref SourceRepoName
-  #     Type: GitHub
-  #     BucketName: !Ref CodeGuruReviewerBucket
-
   MyProfilingGroup:
     Type: AWS::CodeGuruProfiler::ProfilingGroup
     Properties:
@@ -418,16 +410,6 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              # - Resource: !Sub arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceRepoName}
-              #   Effect: Allow
-              #   Action:
-              #     - codecommit:GetBranch
-              #     - codecommit:GetCommit
-              #     - codecommit:ListRepositories
-              #     - codecommit:GetRepository
-              #     - codecommit:UploadArchive
-              #     - codecommit:GetUploadArchiveStatus
-              #     - codecommit:CancelUploadArchive
               - Resource: !Ref SourceRepoConnection
                 Effect: Allow
                 Action:
@@ -443,14 +425,6 @@ Resources:
                   - codebuild:BatchGetBuilds
                   - codebuild:BatchGetBuildBatches
                   - codebuild:StartBuildBatch
-              # - Resource: !GetAtt SourceRepositoryAssociation.AssociationArn
-              #   Effect: Allow
-              #   Action:
-              #     - codeguru-reviewer:List*
-              #     - codeguru-reviewer:Describe*
-              #     - codeguru-reviewer:Get*
-              #     - codeguru:Get*
-              #     - codeguru-reviewer:CreateCodeReview
               - Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${EcrDockerRepository}
                 Effect: Allow
                 Action:
@@ -546,11 +520,6 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-              # - Resource: !Sub arn:${AWS::Partition}:codecommit:${AWS::Region}:${AWS::AccountId}:${SourceRepoName}
-              #   Effect: Allow
-              #   Action:
-              #     - codecommit:GitPull
-              #     - codecommit:TagResource
               - Resource: !Ref SourceRepoConnection
                 Effect: Allow
                 Action:
@@ -562,7 +531,6 @@ Resources:
                 Action:
                   - codeguru-reviewer:AssociateRepository
               - Resource: 
-                  # - !GetAtt SourceRepositoryAssociation.AssociationArn
                   - !Sub arn:${AWS::Partition}:codeguru-reviewer:${AWS::Region}:${AWS::AccountId}:*
                 Effect: Allow
                 Action:
@@ -745,15 +713,12 @@ Resources:
                 Category: Source
                 Owner: AWS
                 Version: 1
-               # Provider: CodeCommit
                 Provider: CodeStarSourceConnection
               Configuration:
                 ConnectionArn: !Ref SourceRepoConnection
                 FullRepositoryId: !Ref SourceRepoName
                 BranchName: !Ref CodeBranchName
                 OutputArtifactFormat: CODEBUILD_CLONE_REF
-                # RepositoryName:
-                #   Ref: SourceRepoName
               OutputArtifacts:
                 - Name: SourceCodeApp
               RunOrder: 1

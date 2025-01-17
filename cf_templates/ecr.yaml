@@ -1,36 +1,12 @@
 Description: >
-  CloudFormation template for creating AWS CodeCommit repository and ECR repository to store cicd java eks code
+  CloudFormation template for creating ECR repository to store cicd java eks docker images
 
 Parameters:
-  # CodeCommitRepositoryName:
-  #   Type: String
-  #   Description: Name of AWS CodeCommit repo to be created
-  # CodeCommitRepositoryBranchName:
-  #   Type: String
-  #   Default: main
-  #   Description: Default Branch
-  # CodeCommitRepositoryS3Bucket:
-  #   Type: String
-  #   Description: Name of S3 Bucket where zip file of initial code will be stored
-  # CodeCommitRepositoryS3BucketObjKey:
-  #   Type: String
-  #   Description: S3 ObjectKey, example-if intial code zip file is stored inside S3 bucket in this location code/cicdstack.zip, then this will be value
   ECRRepositoryName:
     Type: String
     Description: Name of ECR repo to be created
 
 Resources:
-  # MyRepo:
-  #   Type: AWS::CodeCommit::Repository
-  #   Properties:
-  #     RepositoryName: !Ref CodeCommitRepositoryName
-  #     RepositoryDescription: This is a repository for my project with code from CodeCommitRepositoryS3Bucket.
-  #     Code:
-  #       BranchName: !Ref CodeCommitRepositoryBranchName
-  #       S3: 
-  #         Bucket: !Ref CodeCommitRepositoryS3Bucket
-  #         Key: !Ref CodeCommitRepositoryS3BucketObjKey
-
   DockerRepo:
     Type: AWS::ECR::Repository
     Properties:
