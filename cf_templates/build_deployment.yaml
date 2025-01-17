@@ -7,7 +7,7 @@ Parameters:
   SourceRepoConnection:
     Type: String
     Description: >
-      Connection to GitHub repository where the code resides. Connection can be created via CLI or Console in Pending state but then needs to
+      ARN of connection to GitHub account where the code resides. Connection can be created via CLI or Console in Pending state but then needs to
       be activated in Console (https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html).
   SourceRepoName:
     Type: String
